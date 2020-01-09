@@ -3,8 +3,9 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import openpyxl
+import sys
+import csv
 
-school_infos = 0  # school_code 함수 사용을 위한 전역변수 선언
 hang = 0  # 급식 정보가 있는 행 정보 저장을 위한 전역변수 선언
 
 # ~~ 학교 목록과 코드를 불러오는 파트 ~~
@@ -36,8 +37,14 @@ def school_find(name):
 
 # 2. 학교 코드 불러오기
 
-def school_code(num):
-    school_info = school_infos[num]  # 아까 불러온 학교 목록에서 num번째 학교 정보 다시 대입
+def school_code(name, num):
+    num = int(num)
+    url = 'https://www.schoolcodekr.ml/api?q=' + name  # 학교코드 API 주소
+    response = requests.get(url)  # API에 접속하여 해당 이름을 가진 학교를 불러옴
+    school_infos_json = json.loads(response.text)  # json으로 가지고 옴
+    school_infos = school_infos_json['school_infos']  # 가져온 내용에서 학교 정보 부분만 분리
+
+    school_info = school_infos[num]  # 불러온 학교 목록에서 num번째 학교 정보 다시 대입
     school_code = school_info['code']  # 해당 학교 정보에서 코드 부분 대입
     return(school_code)  # 반환
 
@@ -111,12 +118,10 @@ def school_food(ooe, code, ymd, sclass, kindfood):
 # 4. 학교 급식 저장하기 (월간)
 
 def school_food_save(ooe, code, year, month, sclass, kindfood):
-    xx = openpyxl.Workbook()
 
-    sheet = xx.active
-    sheet.title = 'food'
-    sheet['A1'] = '날짜'
-    sheet['B1'] = '급식 정보'
+    cs = open('Yami_' + year + '_' + month + '.csv',
+              'w', encoding='utf-8', newline='')
+    wr_cs = csv.writer(cs)
 
     # 날짜 구하기
     if month == '02':  # 2월 조회시
@@ -132,15 +137,48 @@ def school_food_save(ooe, code, year, month, sclass, kindfood):
         last_day = 30
 
     for day in range(1, last_day + 1):  # 하루 씩 day에 대입
-        xday = day  # 엑셀용 날짜 저장
+        # xday = day  # 엑셀용 날짜 저장
         if day < 10:
             day = '0' + str(day)
         meal = school_food(ooe, code, year + '.' +
                            month + '.' + str(day), sclass, kindfood)  # 급식정보 불러옴
-        sheet.cell(row=xday + 1, column=1).value = meal[0]  # 엑셀에 저장
-        sheet.cell(row=xday + 1, column=2).value = meal[1]
 
-    xx.save('Yami_' + year + '_' + month + ".xlsx")  # 엑셀 파일 생성
+        wr_cs.writerow([meal[0], meal[1]])
+
+    cs.close()
+
+# ~~ 함수를 구분하는 파트 ~~
 
 
-school_food_save('goe', 'J100005611', '2019', '10', '3', '2')
+# 0. 오토핫키 사용을 위한 함수 구분용 함수
+
+def yami(function, para):
+    if function == "school_find":
+        f = open('school_list.txt', 'w')
+        f.write(school_find(para))
+        f.close()
+        # sys.exit()
+    elif function == "school_code":
+        f = open('school_code.txt', 'w')
+        f.write(school_code(para[0], para[1]))
+        f.close()
+        # sys.exit()
+    elif function == "school_food_save":
+        # 교육청, 코드, 년, 월, 교급, 중석식, 아웃풋 파일 설정
+        try:
+            school_food_save(para[0], para[1], para[2],
+                             para[3], para[4], para[5])
+            f = open('result.txt', 'w')
+            f.write('0')
+            f.close()
+            # sys.exit()
+        except:
+            f = open('result.txt', 'w')
+            f.write('1')
+            f.close()
+            # sys.exit()
+
+
+#yami("school_find", "고창중학교")
+#yami("school_code", ["고창중학교", "0"])
+yami("school_food_save", ["goe", "J100005611", "2019", "09", "3", "2"])
