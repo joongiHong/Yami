@@ -29,7 +29,7 @@ Menu, tray, add, 급식보기, food
 Menu, tray, add, 급식편람 도우미, dfood
 Menu, tray, add
 Menu, tray, add, 기초설정 도우미, mfind
-Menu, tray, add, 나이스 코드 수정, mfind
+Menu, tray, add, 나이스 코드 수정, sucode
 Menu, tray, add
 Menu, tray, add, 설정, setting
 Menu, tray, add, 종료, exit
@@ -106,8 +106,8 @@ Gui, Add, Text, x31 y103 w182 h57 , 학교 찾기
 Gui, Font, S10 CFFFFFF, 맑은 고딕
 Gui, Add, Text, x31 y199 w403 h48 , 학교 설정을 위하여 설치 후 최초 1회 학교 찾기를 진행합니다.     급식 정보를 불러올 학교의 이름을 자세하게 입력하여 주십시오.
 Gui, Font, S15 Cdefault, 맑은 고딕
-Gui, Add, Edit, x31 y285 w297 h38 vsname, 불러올 학교 이름을 입력하세요.
-Gui, Add, Button, x338 y285 w96 h38 gsfind, 검색
+Gui, Add, Edit, x31 y275 w297 h38 vsname, 불러올 학교 이름을 입력하세요.
+Gui, Add, Button, x338 y275 w96 h38 gsfind, 검색
 Gui, Show, w460 h371, Yami! %version%
 return
 
@@ -116,7 +116,7 @@ sfind:
 Gui,2:-caption
 Gui,2:Color, 444444
 Gui,2:Font, S25 CFFFFFF Bold, 맑은 고딕
-Gui,2:Add, Text, x55 y45 w201 h48 , 다운로드중... ; 로딩중 표시
+Gui,2:Add, Text, x55 y45 w201 h48 , 학교찾는중... ; 로딩중 표시
 Gui,2:Show, w321 h163, Yami! %version%
 
 Gui, Submit, Nohide
@@ -353,6 +353,30 @@ IfMsgBox, No
 	goto, wc
 }
 
+; 학교 코드 직접 입력
+sucode:
+Gui, Destroy
+Gui, -caption
+Gui, Color, 444444
+Gui, Font, S18 CFFFFFF Bold, 맑은 고딕
+Gui, Add, Picture, x-7 y-2 w470 h172 , theme\sfind_top.png ; 배너 사진
+Gui, Add, Picture, x424 y7 w28 h28 gwc, theme\exit.png ; 나가기 아이콘
+Gui, Font, S30 CFFFFFF Bold, 맑은 고딕
+Gui, Add, Text, x31 y103 w182 h57 , 코드 수정
+Gui, Font, S10 CFFFFFF, 맑은 고딕
+Gui, Add, Text, x31 y199 w403 h48 , 나이스에서 사용하는 학교 구분 코드를 알고 계시면                   급식 정보를 불러올 학교 코드를 직접 수정하실 수 있습니다.
+Gui, Font, S15 Cdefault, 맑은 고딕
+Gui, Add, Edit, x31 y285 w297 h38 vscode, 불러올 학교 코드를 입력하세요.
+Gui, Add, Button, x338 y285 w96 h38 gsucode2, 설정
+Gui, Show, w460 h371, Yami! %version%
+return
+
+sucode2:
+Gui, Submit, Nohide
+IniWrite, %scode%, school_info.ini, school, code
+MsgBox, 64, Yami! %version%, 나이스 학교 코드 수정을 완료하였습니다.`n이제부터 급식 편람을 정상적으로 불러올 수 있습니다.
+goto, wc
+
 ; ----------- 급식편람 도우미 파트 --------------
 
 ; 급식 다운로드
@@ -497,13 +521,13 @@ StringSplit, food11, food1, `, ; CSV 형식으로 나누고
 StringSplit, food22, food2, `,
 StringSplit, food33, food3, `,
 
-StringReplace, food111, food111, <br/>, `n, 1 ; html의 개행 문자를 오토핫키 개행으로 수정한다.
+StringReplace, food112, food112, <br/>, `n, 1 ; html의 개행 문자를 오토핫키 개행으로 수정한다.
 StringReplace, food222, food222, <br/>, `n, 1
-StringReplace, food333, food333, <br/>, `n, 1
+StringReplace, food332, food332, <br/>, `n, 1
 
-if food111 =
+if food112 =
 {
-	food111 = 급식편람이 존재하지 않아 불러올 수 없습니다. ; 급식편람 데이터가 존재하지 않으면 급식편람 안내
+	food112 = 급식편람이 존재하지 않아 불러올 수 없습니다. ; 급식편람 데이터가 존재하지 않으면 급식편람 안내
 }
 
 if food222 =
@@ -511,9 +535,9 @@ if food222 =
 	food222 = 급식편람이 존재하지 않아 불러올 수 없습니다.
 }
 
-if food333 =
+if food332 =
 {
-	food333 = 급식편람이 존재하지 않아 불러올 수 없습니다.
+	food332 = 급식편람이 존재하지 않아 불러올 수 없습니다.
 }
 
 Gui, Submit, Nohide
@@ -531,17 +555,15 @@ Gui, Add, Button, x250 y199 w96 h20 gnfood, 조회
 Gui, Font, S10 CFFFFFF, 맑은 고딕
 Gui, Add, Tab2, x31 h200, 조식|중식||석식
 Gui, Tab, 1
-Gui, Add, Text, w300 h150, %food111% ; 조식 표시
+Gui, Add, Text, w300 h150, %food112% ; 조식 표시
 Gui, Tab, 2
 Gui, Add, Text, w300 h150, %food222% ; 중식 표시
 Gui, Tab, 3
-Gui, Add, Text, w300 h150, %food333% ; 석식 표시
+Gui, Add, Text, w300 h150, %food332% ; 석식 표시
 Gui, Show, w460 h450, Yami! %version%
 return
 
 nfood:
-Gui, Submit, Nohide
-
 Gui, Submit, Nohide
 date := SubStr(date,1,8)
 year := SubStr(date,1,4)
@@ -556,13 +578,13 @@ StringSplit, food11, food1, `, ; CSV 형식으로 나누고
 StringSplit, food22, food2, `,
 StringSplit, food33, food3, `,
 
-StringReplace, food111, food111, <br/>, `n, 1 ; html의 개행 문자를 오토핫키 개행으로 수정한다.
+StringReplace, food112, food112, <br/>, `n, 1 ; html의 개행 문자를 오토핫키 개행으로 수정한다.
 StringReplace, food222, food222, <br/>, `n, 1
-StringReplace, food333, food333, <br/>, `n, 1
+StringReplace, food332, food332, <br/>, `n, 1
 
-if food111 =
+if food112 =
 {
-	food111 = 급식편람이 존재하지 않아 불러올 수 없습니다. ; 급식편람 데이터가 존재하지 않으면 급식편람 안내
+	food112 = 급식편람이 존재하지 않아 불러올 수 없습니다. ; 급식편람 데이터가 존재하지 않으면 급식편람 안내
 }
 
 if food222 =
@@ -570,9 +592,9 @@ if food222 =
 	food222 = 급식편람이 존재하지 않아 불러올 수 없습니다.
 }
 
-if food333 =
+if food332 =
 {
-	food333 = 급식편람이 존재하지 않아 불러올 수 없습니다.
+	food332 = 급식편람이 존재하지 않아 불러올 수 없습니다.
 }
 
 Gui, Submit, Nohide
@@ -590,18 +612,38 @@ Gui, Add, Button, x250 y199 w96 h20 gnfood, 조회
 Gui, Font, S10 CFFFFFF, 맑은 고딕
 Gui, Add, Tab2, x31 h200, 조식|중식||석식
 Gui, Tab, 1
-Gui, Add, Text, w300 h150, %food111% ; 조식 표시
+Gui, Add, Text, w300 h150, %food112% ; 조식 표시
 Gui, Tab, 2
 Gui, Add, Text, w300 h150, %food222% ; 중식 표시
 Gui, Tab, 3
-Gui, Add, Text, w300 h150, %food333% ; 석식 표시
+Gui, Add, Text, w300 h150, %food332% ; 석식 표시
 Gui, Show, w460 h450, Yami! %version%
 return
 
 ; ----------- 설정 파트 --------------
 
 setting:
-Msgbox, 응 그래
+Gui, Submit, Nohide
+Gui, Destroy
+Gui, -caption
+Gui, Color, 444444
+Gui, Font, S18 CFFFFFF Bold, 맑은 고딕
+Gui, Add, Picture, x-7 y-2 w470 h172 , theme\setting_top.png ; 배너 사진
+Gui, Add, Picture, x424 y7 w28 h28 gwc, theme\exit.png ; 나가기 아이콘
+Gui, Font, S30 CFFFFFF Bold, 맑은 고딕
+Gui, Add, Text, x31 y103 w280 h57 , 설정
+Gui, Font, S10 Cdefault, 맑은 고딕
+Gui, Add, DateTime, x31 y199 w197 h20 vdate Choose%date%, yyyy M d
+Gui, Add, Button, x250 y199 w96 h20 gnfood, 조회
+Gui, Font, S10 CFFFFFF, 맑은 고딕
+Gui, Add, Tab2, x31 h200, 조식|중식||석식
+Gui, Tab, 1
+Gui, Add, Text, w300 h150, %food111% ; 조식 표시
+Gui, Tab, 2
+Gui, Add, Text, w300 h150, %food222% ; 중식 표시
+Gui, Tab, 3
+Gui, Add, Text, w300 h150, %food333% ; 석식 표시
+Gui, Show, w460 h450, Yami! %version%
 return
 
 ; ----------- 기타 파트 --------------
