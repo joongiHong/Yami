@@ -489,17 +489,31 @@ IfNotExist, Yami_%A_YYYY%_%A_MM%_3.csv ; 이번달 급식편람 유무 확인
 	}
 }
 
-FileReadLine, food1, Yami_%A_YYYY%_%A_MM%_1.csv, %A_DD%
+FileReadLine, food1, Yami_%A_YYYY%_%A_MM%_1.csv, %A_DD% ; 급식 편람을 불러와서
 FileReadLine, food2, Yami_%A_YYYY%_%A_MM%_2.csv, %A_DD%
 FileReadLine, food3, Yami_%A_YYYY%_%A_MM%_3.csv, %A_DD%
 
-StringSplit, food11, food1, `,
+StringSplit, food11, food1, `, ; CSV 형식으로 나누고
 StringSplit, food22, food2, `,
 StringSplit, food33, food3, `,
+
+StringReplace, food111, food111, <br/>, `n, 1 ; html의 개행 문자를 오토핫키 개행으로 수정한다.
+StringReplace, food222, food222, <br/>, `n, 1
+StringReplace, food333, food333, <br/>, `n, 1
+
+if food111 =
+{
+	food111 = 급식편람이 존재하지 않아 불러올 수 없습니다. ; 급식편람 데이터가 존재하지 않으면 급식편람 안내
+}
 
 if food222 =
 {
 	food222 = 급식편람이 존재하지 않아 불러올 수 없습니다.
+}
+
+if food333 =
+{
+	food333 = 급식편람이 존재하지 않아 불러올 수 없습니다.
 }
 
 Gui, Submit, Nohide
@@ -515,8 +529,14 @@ Gui, Font, S10 Cdefault, 맑은 고딕
 Gui, Add, DateTime, x31 y199 w197 h20 vdate, yyyy M d
 Gui, Add, Button, x250 y199 w96 h20 gnfood, 조회
 Gui, Font, S10 CFFFFFF, 맑은 고딕
-Gui, Add, Text, x31 y240 w300 h150, %food222%
-Gui, Show, w460 h371, Yami! %version%
+Gui, Add, Tab2, x31 h200, 조식|중식||석식
+Gui, Tab, 1
+Gui, Add, Text, w300 h150, %food111% ; 조식 표시
+Gui, Tab, 2
+Gui, Add, Text, w300 h150, %food222% ; 중식 표시
+Gui, Tab, 3
+Gui, Add, Text, w300 h150, %food333% ; 석식 표시
+Gui, Show, w460 h450, Yami! %version%
 return
 
 nfood:
@@ -528,21 +548,34 @@ year := SubStr(date,1,4)
 month := SubStr(date,5,2)
 day := SubStr(date,7,2)
 
-; 여기서부터 수정
+FileReadLine, food1, Yami_%year%_%month%_1.csv, %day% ; 급식 편람을 불러와서
+FileReadLine, food2, Yami_%year%_%month%_2.csv, %day%
+FileReadLine, food3, Yami_%year%_%month%_3.csv, %day%
 
-FileReadLine, food1, Yami_%A_YYYY%_%A_MM%_1.csv, %A_DD%
-FileReadLine, food2, Yami_%A_YYYY%_%A_MM%_2.csv, %A_DD%
-FileReadLine, food3, Yami_%A_YYYY%_%A_MM%_3.csv, %A_DD%
-
-StringSplit, food11, food1, `,
+StringSplit, food11, food1, `, ; CSV 형식으로 나누고
 StringSplit, food22, food2, `,
 StringSplit, food33, food3, `,
+
+StringReplace, food111, food111, <br/>, `n, 1 ; html의 개행 문자를 오토핫키 개행으로 수정한다.
+StringReplace, food222, food222, <br/>, `n, 1
+StringReplace, food333, food333, <br/>, `n, 1
+
+if food111 =
+{
+	food111 = 급식편람이 존재하지 않아 불러올 수 없습니다. ; 급식편람 데이터가 존재하지 않으면 급식편람 안내
+}
 
 if food222 =
 {
 	food222 = 급식편람이 존재하지 않아 불러올 수 없습니다.
 }
 
+if food333 =
+{
+	food333 = 급식편람이 존재하지 않아 불러올 수 없습니다.
+}
+
+Gui, Submit, Nohide
 Gui, Destroy
 Gui, -caption
 Gui, Color, 444444
@@ -552,11 +585,17 @@ Gui, Add, Picture, x424 y7 w28 h28 gwc, theme\exit.png ; 나가기 아이콘
 Gui, Font, S30 CFFFFFF Bold, 맑은 고딕
 Gui, Add, Text, x31 y103 w280 h57 , 급식편람 조회
 Gui, Font, S10 Cdefault, 맑은 고딕
-Gui, Add, DateTime, x31 y199 w197 h20 vdate, yyyy M d
+Gui, Add, DateTime, x31 y199 w197 h20 vdate Choose%date%, yyyy M d
 Gui, Add, Button, x250 y199 w96 h20 gnfood, 조회
 Gui, Font, S10 CFFFFFF, 맑은 고딕
-Gui, Add, Text, x31 y240 w300 h150, %food222%
-Gui, Show, w460 h371, Yami! %version%
+Gui, Add, Tab2, x31 h200, 조식|중식||석식
+Gui, Tab, 1
+Gui, Add, Text, w300 h150, %food111% ; 조식 표시
+Gui, Tab, 2
+Gui, Add, Text, w300 h150, %food222% ; 중식 표시
+Gui, Tab, 3
+Gui, Add, Text, w300 h150, %food333% ; 석식 표시
+Gui, Show, w460 h450, Yami! %version%
 return
 
 ; ----------- 설정 파트 --------------
