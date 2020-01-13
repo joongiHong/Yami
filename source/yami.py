@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import openpyxl
 import sys
 import csv
+import os
 
 hang = 0  # 급식 정보가 있는 행 정보 저장을 위한 전역변수 선언
 
@@ -28,14 +29,12 @@ def school_find(name):
         school_info = school_infos[i]  # 한 개의 학교 정보만 대입
         school_name = school_info['name']  # 학교 이름을 school_name 변수에 대입
         school_address = school_info['address']  # 학교 주소를 school_address 변수에 대입
-        school = school + str(i) + "번째" +\
-            "\n학교 이름 : " + school_name +\
-            "\n학교 주소 : " + school_address + "\n"  # 기존의 출력 내용과 신규 내용 합산
+        school = school + school_name + "(" + school_address + ")" + "|"
 
     return(school)
 
 
-# 2. 학교 코드 불러오기
+# 2. 학교 코드, 교급 불러오기
 
 def school_code(name, num):
     num = int(num)
@@ -46,7 +45,8 @@ def school_code(name, num):
 
     school_info = school_infos[num]  # 불러온 학교 목록에서 num번째 학교 정보 다시 대입
     school_code = school_info['code']  # 해당 학교 정보에서 코드 부분 대입
-    return(school_code)  # 반환
+    school_type = school_info['type']  # 해당 학교 정보에서 교급 부분 대입
+    return(school_code + "\n" + school_type)  # 반환
 
 
 # ~~ 학교 급식을 불러오고 저장하는 파트 ~~
@@ -96,21 +96,23 @@ def school_food(ooe, code, ymd, sclass, kindfood):
 
     # 급식 정보 가져오기
 
-    food = foodhtml_data_tr[2].find_all('td')  # 급식정보가 있는 열 가져오기
-    food = str(food[hang])
+    try:
+        food = foodhtml_data_tr[2].find_all('td')  # 급식정보가 있는 열 가져오기
+        food = str(food[hang])
 
-    food_filter = ['<td class="textC">',
-                   '<td class="textC last">', '</td>']
+        food_filter = ['<td class="textC">',
+                       '<td class="textC last">', '</td>']
 
-    for sakje in food_filter:
-        food = food.replace(sakje, '')  # 찌끄레기 삭제
+        for sakje in food_filter:
+            food = food.replace(sakje, '')  # 찌끄레기 삭제
 
-    food = food.replace('<br/>', '`n')  # html 코드 변환
+        if food == ' ':
+            food = '급식이 예정되지 않았거나 급식 정보가 없습니다.'
 
-    if food == ' ':
-        food = '급식이 예정되지 않았거나 급식 정보가 없습니다.\n'
-
-    output = [date, food]
+        output = [date, food]
+    except:
+        food = '급식이 예정되지 않았거나 급식 정보가 없습니다.'
+        output = [date, food]
 
     return(output)
 
@@ -118,9 +120,8 @@ def school_food(ooe, code, ymd, sclass, kindfood):
 # 4. 학교 급식 저장하기 (월간)
 
 def school_food_save(ooe, code, year, month, sclass, kindfood):
-
-    cs = open('Yami_' + year + '_' + month + '.csv',
-              'w', encoding='utf-8', newline='')
+    cs = open('Yami_' + year + '_' + month + '_' + kindfood + '.csv',
+              'w', encoding='ansi', newline='')
     wr_cs = csv.writer(cs)
 
     # 날짜 구하기
@@ -149,12 +150,12 @@ def school_food_save(ooe, code, year, month, sclass, kindfood):
 
 # ~~ 함수를 구분하는 파트 ~~
 
-
 # 0. 오토핫키 사용을 위한 함수 구분용 함수
+
 
 def yami(function, para):
     if function == "school_find":
-        f = open('school_list.txt', 'w')
+        f = open('school_find.txt', 'w')
         f.write(school_find(para))
         f.close()
         # sys.exit()
@@ -164,21 +165,17 @@ def yami(function, para):
         f.close()
         # sys.exit()
     elif function == "school_food_save":
-        # 교육청, 코드, 년, 월, 교급, 중석식, 아웃풋 파일 설정
-        try:
-            school_food_save(para[0], para[1], para[2],
-                             para[3], para[4], para[5])
-            f = open('result.txt', 'w')
-            f.write('0')
-            f.close()
-            # sys.exit()
-        except:
-            f = open('result.txt', 'w')
-            f.write('1')
-            f.close()
-            # sys.exit()
+        # 교육청, 코드, 년, 월, 교급, 중석식
+        school_food_save(para[0], para[1], para[2],
+                         para[3], para[4], para[5])
 
 
-#yami("school_find", "고창중학교")
-#yami("school_code", ["고창중학교", "0"])
-yami("school_food_save", ["goe", "J100005611", "2019", "09", "3", "2"])
+if __name__ == "__main__":
+    func = sys.argv[1]
+    if func == "school_find":
+        yami(func, sys.argv[2])
+    elif func == "school_code":
+        yami(func, [sys.argv[2], sys.argv[3]])
+    else:
+        yami(func, [sys.argv[2], sys.argv[3], sys.argv[4],
+                    sys.argv[5], sys.argv[6], sys.argv[7]])
