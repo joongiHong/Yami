@@ -31,7 +31,7 @@ Menu, tray, add
 Menu, tray, add, 기초설정 도우미, mfind
 Menu, tray, add, 나이스 코드 수정, sucode
 Menu, tray, add
-Menu, tray, add, 설정, setting
+Menu, tray, add, 환경설정, setting
 Menu, tray, add, 종료, exit
 
 ; 아무대나 잡아도 상관 없도록
@@ -414,10 +414,10 @@ Gui, Add, Text, x31 y103 w280 h57 , 급식편람 받기
 Gui, Font, S10 CFFFFFF, 맑은 고딕
 Gui, Add, Text, x31 y199 w403 h48 , 급식편람 다운로드를 위하여 급식편람 설정을 진행합니다.        다운받을 편람의 날짜를 반드시 클릭하여 주십시오.
 Gui, Font, S10 Cdefault, 맑은 고딕
-Gui, Add, ListBox, x31 y285 w297 h20 vyear, 년도를 선택해 주십시오.|2019년|2020년|
-Gui, Add, ListBox, x31 y309 w297 h20 vmonth, 월을 선택해 주십시오.|01월|02월|03월|04월|05월|06월|07월|08월|09월|10월|11월|12월
+Gui, Add, DropDownList, x31 y285 w297 h20 vyear, 년도를 선택해 주십시오.||2019년|2020년|
+Gui, Add, DropDownList, x31 y309 w297 h20 vmonth, 월을 선택해 주십시오.||01월|02월|03월|04월|05월|06월|07월|08월|09월|10월|11월|12월
 Gui, Font, S15 Cdefault, 맑은 고딕
-Gui, Add, Button, x338 y285 w96 h44 gddfood, 설정
+Gui, Add, Button, x338 y285 w96 h46 gddfood, 설정
 Gui, Show, w460 h371, Yami! %version%
 return
 
@@ -631,18 +631,20 @@ Gui, Font, S18 CFFFFFF Bold, 맑은 고딕
 Gui, Add, Picture, x-7 y-2 w470 h172 , theme\setting_top.png ; 배너 사진
 Gui, Add, Picture, x424 y7 w28 h28 gwc, theme\exit.png ; 나가기 아이콘
 Gui, Font, S30 CFFFFFF Bold, 맑은 고딕
-Gui, Add, Text, x31 y103 w280 h57 , 설정
+Gui, Add, Text, x31 y103 w182 h57 , 환경설정
 Gui, Font, S10 Cdefault, 맑은 고딕
-Gui, Add, DateTime, x31 y199 w197 h20 vdate Choose%date%, yyyy M d
-Gui, Add, Button, x250 y199 w96 h20 gnfood, 조회
 Gui, Font, S10 CFFFFFF, 맑은 고딕
-Gui, Add, Tab2, x31 h200, 조식|중식||석식
+Gui, Add, Tab2, x31 w380 h250, 편람관리||알림|만든이
 Gui, Tab, 1
-Gui, Add, Text, w300 h150, %food111% ; 조식 표시
+Gui, Font, S10 CFFFFFF, 맑은 고딕
+Gui, Add, Checkbox, vcsvdelete, 이번달 편람이 아닌 급식편람 삭제
 Gui, Tab, 2
-Gui, Add, Text, w300 h150, %food222% ; 중식 표시
+Gui, Add, Checkbox, valertuse, 지정된 시간이 되면 오늘 급식 알려주기
 Gui, Tab, 3
-Gui, Add, Text, w300 h150, %food333% ; 석식 표시
+Gui, Font, S20 CFFFFFF, 맑은 고딕
+Gui, Add, Text,, By. ZERO
+Gui, Font, S9 CFFFFFF, 맑은 고딕
+Gui, Add, Text,, 본 프로그램은 급식앱은 있는데 왜 급식프로그램은 없나?`n하는 생각에서 출발하여 만들어졌습니다.`n어디사는 누구든지 무료로 자유롭게 사용하실 수 있습니다.`n`nCopyright 2020. 홍준기. All rights reserved`n본 프로그램에 대한 모든 판권은 홍준기가 소유합니다. 
 Gui, Show, w460 h450, Yami! %version%
 return
 
